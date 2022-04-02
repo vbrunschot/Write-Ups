@@ -2,7 +2,7 @@
 ```
 sudo nmap -sV -p- -sC -oN nmap.txt -O 10.10.10.13 -T5
 ```
-<img src="https://raw.githubusercontent.com/vbrunschot/Write-Ups/main/HackTheBox/main/Cronos/assets/1.png">
+<img src="https://raw.githubusercontent.com/vbrunschot/Write-Ups/main/HackTheBox/Cronos/assets/1.png">
 
 # Enumeration
 Running gobuster didn't result in anything.
