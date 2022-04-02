@@ -2,7 +2,7 @@
 ```
 sudo nmap -sV -sC -O -p- -oN nmap.txt -Pn 10.10.186.109
 ```
-<img src="https://raw.githubusercontent.com/vbrunschot/Write-Ups/main/TryHackMe/main/AttacktiveDirectory/assets/1.png">
+<img src="https://raw.githubusercontent.com/vbrunschot/Write-Ups/main/TryHackMe/AttacktiveDirectory/assets/1.png">
 
 A lot of open ports and the target appears to be a domain controller. This will most likely give us a lot of enumeration abilities.
 <br>
