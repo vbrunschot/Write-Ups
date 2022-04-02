@@ -2,7 +2,7 @@
 ```
 sudo nmap -sV -p- -sC -oN nmap.txt -O 10.10.10.43 -T5  
 ```
-<img src="https://raw.githubusercontent.com/vbrunschot/HackTheBox/main/Nineveh/assets/1.png">
+<img src="https://raw.githubusercontent.com/vbrunschot/Write-Ups/main/HackTheBox/Nineveh/assets/1.png">
 
 # Enumeration
 We'll start of with scanning for directories on port 80 and 443.
@@ -27,7 +27,7 @@ Hydra scan on http:
 ```
 hydra -P /usr/share/wordlists/rockyou.txt 10.10.10.43 http-post-form "/department/login.php:username=^USER^&password=^PASS^:Invalid Password!" -T 64 -V -l admin
 ```
-<img src="https://raw.githubusercontent.com/vbrunschot/HackTheBox/main/Nineveh/assets/2.png">
+<img src="https://raw.githubusercontent.com/vbrunschot/Write-Ups/main/HackTheBox/Nineveh/assets/2.png">
 
 Hydra bruteforced a password for each login form.
 
@@ -42,13 +42,13 @@ But we are unable to connect as port 22 is closed. (At least for now)
 
 # Exploiting RCE and LFI
 After a quick Google search we learn that phpLiteAdmin version 1.9 is vulnerable to remote PHP code injection.
-<img src="https://raw.githubusercontent.com/vbrunschot/HackTheBox/main/Nineveh/assets/3.png">
+<img src="https://raw.githubusercontent.com/vbrunschot/Write-Ups/main/HackTheBox/Nineveh/assets/3.png">
 
 > https://www.exploit-db.com/exploits/24044
 
 We'll have to create a database and give it a ```php``` extension. Then we'll add a table and add a php command in the filed. We will use this to test if the exploit works.
 
-<img src="https://raw.githubusercontent.com/vbrunschot/HackTheBox/main/Nineveh/assets/4.png">
+<img src="https://raw.githubusercontent.com/vbrunschot/Write-Ups/main/HackTheBox/Nineveh/assets/4.png">
 
 At this moment it's not sure how we can access the database and hereby executing the php script.
 Let continue with the other login at ```http://10.10.10.43/department```. Maybe we can chain some things together.
@@ -56,10 +56,10 @@ Let continue with the other login at ```http://10.10.10.43/department```. Maybe 
 There appears to be local file inclusion vulnerability but if we change the address we get the message saying there's no note selected. 
 
 If we rename the database so it includes ```ninevehNotes.txt``` we hopefully can bypass this.
-<img src="https://raw.githubusercontent.com/vbrunschot/HackTheBox/main/Nineveh/assets/5.png">
+<img src="https://raw.githubusercontent.com/vbrunschot/Write-Ups/main/HackTheBox/Nineveh/assets/5.png">
 
 We can use the local file inclusion vulnerability in combination with the reverse code injection to run our test script:
-<img src="https://raw.githubusercontent.com/vbrunschot/HackTheBox/main/Nineveh/assets/6.png">
+<img src="https://raw.githubusercontent.com/vbrunschot/Write-Ups/main/HackTheBox/Nineveh/assets/6.png">
 
 # Initial Foothold
 Now let's change the script to a reverse php shell in order to get a shell on the host. 
@@ -78,15 +78,15 @@ We can download and run ```linpeas.sh``` to do some enumerating. We spot a cronj
 
 Strange thing is that we find port 22 being used but it didn't turn up during our initial portscan. Is there some mechanism preventing us from accessing it?
 
-<img src="https://raw.githubusercontent.com/vbrunschot/HackTheBox/main/Nineveh/assets/7.png">
+<img src="https://raw.githubusercontent.com/vbrunschot/Write-Ups/main/HackTheBox/Nineveh/assets/7.png">
 
 After some digging around we found out that ```knock``` is running as ```root```. 
-<img src="https://raw.githubusercontent.com/vbrunschot/HackTheBox/main/Nineveh/assets/8.png">
+<img src="https://raw.githubusercontent.com/vbrunschot/Write-Ups/main/HackTheBox/Nineveh/assets/8.png">
 
 > Wiki: In computer networking, port knocking is a method of externally opening ports on a firewall by generating a connection attempt on a set of prespecified closed ports. Once a correct sequence of connection attempts is received, the firewall rules are dynamically modified to allow the host which sent the connection attempts to connect over specific port(s)
 
 Now let's go look for some config files to see if we can get the knock key:
-<img src="https://raw.githubusercontent.com/vbrunschot/HackTheBox/main/Nineveh/assets/9.png">
+<img src="https://raw.githubusercontent.com/vbrunschot/Write-Ups/main/HackTheBox/Nineveh/assets/9.png">
 
 Found it at ```/etc/knockd.conf```. (We also found it in ```/var/mail/armois```).
 Now we can use that key to open up the port for us:
@@ -100,7 +100,7 @@ Let's investigate the cronjob that we found earlier. It deletes every file in th
 
 > https://www.exploit-db.com/exploits/33899
 
-<img src="https://raw.githubusercontent.com/vbrunschot/HackTheBox/main/Nineveh/assets/10.png">
+<img src="https://raw.githubusercontent.com/vbrunschot/Write-Ups/main/HackTheBox/Nineveh/assets/10.png">
 
 The file ```/tmp/update``` is executed by ckhrootkit as root. As this file does not currently exist, it is possible to put a bash script in its place and use it to grant us a root shell.
 
