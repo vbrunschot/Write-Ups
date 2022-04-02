@@ -2,7 +2,7 @@
 ```
 sudo nmap -sV -p- -sC -oN nmap.txt -O 10.10.229.15 -T5
 ```
-<img src ="https://raw.githubusercontent.com/vbrunschot/TryHackMe/main/Lockdown/assets/1.png">
+<img src ="https://raw.githubusercontent.com/vbrunschot/Write-Ups/main/TryHackMe/Lockdown/assets/1.png">
 
 # Enumeration
 By browsing to ```http://10.10.229.15/``` we are redirected to ```http://contacttracer.thm/login.php```. We'll have to add ```contacttracer.thm``` to the ```/etc/hosts```.
@@ -36,11 +36,11 @@ But another way is to upload a reverse php shell at the system info page. If you
 
 As there is no obvious way to escalate our privileges we will try to reuse the password we cracked earlier. That worked for user ```cyrus```.
 
-<img src ="https://raw.githubusercontent.com/vbrunschot/TryHackMe/main/Lockdown/assets/2.png">
+<img src ="https://raw.githubusercontent.com/vbrunschot/Write-Ups/main/TryHackMe/Lockdown/assets/2.png">
 
 Running ```sudo -l``` shows us a script that can be run as root:
 
-<img src ="https://raw.githubusercontent.com/vbrunschot/TryHackMe/main/Lockdown/assets/3.png">
+<img src ="https://raw.githubusercontent.com/vbrunschot/Write-Ups/main/TryHackMe/Lockdown/assets/3.png">
 
 We see that the scripts scans files for virusses and gives user cyrus read permissions of the files in quarantine. We can use a YARA rule to let clamscan detect a file as a virus. As we're looking for the content of ```/root/root.txt`` we will use the following script:
 ```
@@ -56,7 +56,7 @@ rule CheckFileName
 ```
 We will delete ```/var/lib/clamav/main.hdb``` and save our rule as ```rule.yara``` (using curl). Running the script with sudo will place root.txt in quarantine. And now we can view is as user cyrus.
 
-<img src ="https://raw.githubusercontent.com/vbrunschot/TryHackMe/main/Lockdown/assets/4.png">
+<img src ="https://raw.githubusercontent.com/vbrunschot/Write-Ups/main/TryHackMe/Lockdown/assets/4.png">
 
 
 

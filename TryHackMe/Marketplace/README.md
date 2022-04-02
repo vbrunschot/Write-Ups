@@ -2,7 +2,7 @@
 ```
 sudo nmap -sV -sC -O -p- -oN nmap.txt -Pn 10.10.73.172
 ```
-<img src ="https://raw.githubusercontent.com/vbrunschot/TryHackMe/main/Marketplace/assets/1.png">
+<img src ="https://raw.githubusercontent.com/vbrunschot/Write-Ups/main/TryHackMe/Marketplace/assets/1.png">
 
 # Enumeration
 We will start by browsing the website on port 80. We are welcomed by a website which shows us two messages of michael and jake. We tried login in as both users with simple passwords, but without any luck. Also tried if i could use SQL injection on the password field:
@@ -13,7 +13,7 @@ None of the above worked. But what i could do was create a new account (test:tes
 ```js
 <script>alert('XSS');</script>
 ```
-<img src ="https://raw.githubusercontent.com/vbrunschot/TryHackMe/main/Marketplace/assets/2.png">
+<img src ="https://raw.githubusercontent.com/vbrunschot/Write-Ups/main/TryHackMe/Marketplace/assets/2.png">
 
 <br>
 I got kinda stuck for a moment. Not sure how we could abuse the fact that the website has a XSS vulnerability. I found out that we can report messages to a admin. We could then try to steal his cookie. After some searching around i found a usefull script that could help me: XSS-cookie-stealer.py.
@@ -30,10 +30,10 @@ Change the listening host in the script and run it. I added the following script
 https://github.com/shelld3v/JSshell
 
 We got the admin cookie:
-<img src ="https://raw.githubusercontent.com/vbrunschot/TryHackMe/main/Marketplace/assets/3.png">
+<img src ="https://raw.githubusercontent.com/vbrunschot/Write-Ups/main/TryHackMe/Marketplace/assets/3.png">
 
 After changing the cookie in FireFox (under Web Developer ->Storage Inspector -> Cookies) we now have access to the admin page.
-<img src ="https://raw.githubusercontent.com/vbrunschot/TryHackMe/main/Marketplace/assets/4.png">
+<img src ="https://raw.githubusercontent.com/vbrunschot/Write-Ups/main/TryHackMe/Marketplace/assets/4.png">
 
 As I browse around the admin panel i spot SQL queries on the different users:
 ```
@@ -45,10 +45,10 @@ sqlmap -u "http://10.10.73.172/admin?user=1" --cookie='token=eyJhbGciOiJIUzI1NiI
 ```
 
 We get hashes from users but i was unable to crack them.
-<img src ="https://raw.githubusercontent.com/vbrunschot/TryHackMe/main/Marketplace/assets/5.png">
+<img src ="https://raw.githubusercontent.com/vbrunschot/Write-Ups/main/TryHackMe/Marketplace/assets/5.png">
 
 Spotted a message with a password:
-<img src ="https://raw.githubusercontent.com/vbrunschot/TryHackMe/main/Marketplace/assets/6.png">
+<img src ="https://raw.githubusercontent.com/vbrunschot/Write-Ups/main/TryHackMe/Marketplace/assets/6.png">
 ```
 @b_ENXkGYUCAv3zJ
 ```
@@ -63,7 +63,7 @@ We got a shell and got user. User michael didn't work.
 
 # Privilege escalation
 With ```sudo -l``` we spot a script that michael can run with sudo rights:
-<img src ="https://raw.githubusercontent.com/vbrunschot/TryHackMe/main/Marketplace/assets/8.png">
+<img src ="https://raw.githubusercontent.com/vbrunschot/Write-Ups/main/TryHackMe/Marketplace/assets/8.png">
 
 I knew there was a way to exploit the wildcard in tar for privilege escalation.
 > Read this post: https://www.hackingarticles.in/exploiting-wildcard-for-privilege-escalation/

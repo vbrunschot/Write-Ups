@@ -2,7 +2,7 @@
 ```
 sudo nmap -sV -p- -Pn -oN nmap.txt -O 10.10.23.154
 ```
-<img src="https://raw.githubusercontent.com/vbrunschot/TryHackMe/main/Internal/assets/1.png">
+<img src="https://raw.githubusercontent.com/vbrunschot/Write-Ups/main/TryHackMe/Internal/assets/1.png">
 
 We run gobuster to discover directories:
 ```

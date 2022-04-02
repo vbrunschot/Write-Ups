@@ -6,16 +6,16 @@ sudo nmap -sV -sC -p- 10.10.125.217 -T4
 ```
 
 That shows us that several ports are open.
-<img src="https://raw.githubusercontent.com/vbrunschot/TryHackMe/main/UltraTech/assets/1.png">
+<img src="https://raw.githubusercontent.com/vbrunschot/Write-Ups/main/TryHackMe/UltraTech/assets/1.png">
 <br>
 # Port 21
 I tried connecting anonymously on the FTP server but without any luck.
 
-<img src="https://raw.githubusercontent.com/vbrunschot/TryHackMe/main/UltraTech/assets/7.png">
+<img src="https://raw.githubusercontent.com/vbrunschot/Write-Ups/main/TryHackMe/UltraTech/assets/7.png">
 
 
 I then conduct a directory scan with gobuster on both the services:
-<img src="https://raw.githubusercontent.com/vbrunschot/TryHackMe/main/UltraTech/assets/6.png">
+<img src="https://raw.githubusercontent.com/vbrunschot/Write-Ups/main/TryHackMe/UltraTech/assets/6.png">
 We find some interesting folders. Let's start off with port 31331.
 <br>
 # Port 31331
@@ -27,11 +27,11 @@ Francois LeMytho | P4c0
 Alvaro Squalo | Sq4l
 ```
 We read the robots.txt and find a reference to a textfile: /utech_sitemap.txt
-<img src="https://raw.githubusercontent.com/vbrunschot/TryHackMe/main/UltraTech/assets/3.png">
+<img src="https://raw.githubusercontent.com/vbrunschot/Write-Ups/main/TryHackMe/UltraTech/assets/3.png">
 
 
 We also find a reference to a api that runs on port 8081. There seems to be a function which can be used to ping a host.
-<img src="https://raw.githubusercontent.com/vbrunschot/TryHackMe/main/UltraTech/assets/4.png">
+<img src="https://raw.githubusercontent.com/vbrunschot/Write-Ups/main/TryHackMe/UltraTech/assets/4.png">
 <br>
 # Port 8081
 
@@ -43,7 +43,7 @@ I finally have a list command:
 ```sh
 http://10.10.125.217:8081/ping?ip=localhost%0Als
 ```
-<img src="https://raw.githubusercontent.com/vbrunschot/TryHackMe/main/UltraTech/assets/5.png">
+<img src="https://raw.githubusercontent.com/vbrunschot/Write-Ups/main/TryHackMe/UltraTech/assets/5.png">
 
 We discover a sqlite database. Let's see what's inside:
 ```sh
@@ -76,7 +76,7 @@ docker run -v /:/mnt --rm -it bash chroot /mnt sh
 ```
 We now have a root shell.
 
-<img src="https://raw.githubusercontent.com/vbrunschot/TryHackMe/main/UltraTech/assets/8.png">
+<img src="https://raw.githubusercontent.com/vbrunschot/Write-Ups/main/TryHackMe/UltraTech/assets/8.png">
 
 
 

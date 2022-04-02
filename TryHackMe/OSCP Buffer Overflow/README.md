@@ -15,11 +15,11 @@ We start by connecting with xfreerdp and setting the network to home. After that
 !mona config -set workingfolder c:\mona\%p
 ```
 Load the oscp.exe file in Immunity Debugger and start the program with ```F9```. We will now have the service running. 
-<img src="https://raw.githubusercontent.com/vbrunschot/TryHackMe/main/OSCP%20Buffer%20Overflow/assets/1.png">
+<img src="https://raw.githubusercontent.com/vbrunschot/Write-Ups/main/TryHackMe/OSCP%20Buffer%20Overflow/assets/1.png">
 
 After a quick portscan we see that the application is running on port 1337. We connect with the application using netcat and discover that we can send commands using: ```OVERFLOW1 [value]```.
 
-<img src="https://raw.githubusercontent.com/vbrunschot/TryHackMe/main/OSCP%20Buffer%20Overflow/assets/2.png">
+<img src="https://raw.githubusercontent.com/vbrunschot/Write-Ups/main/TryHackMe/OSCP%20Buffer%20Overflow/assets/2.png">
 
 # Fuzzing
 We will use a fuzzer (01-fuzzer.py) to see if we can break the application by sending an increasingly amount of bytes. This will be done by sending ```A``` a hundred times and repeat that process untill we get a notification that the application crashed.
@@ -55,7 +55,7 @@ while True:
 
 We crashed the application around 2000 bytes. We will use this later on to detect the memory offset of the EIP location as a starting point for our exploit.
 
-<img src="https://raw.githubusercontent.com/vbrunschot/TryHackMe/main/OSCP%20Buffer%20Overflow/assets/3.png">
+<img src="https://raw.githubusercontent.com/vbrunschot/Write-Ups/main/TryHackMe/OSCP%20Buffer%20Overflow/assets/3.png">
 
 
 # Crash replication & Controlling EIP
@@ -64,13 +64,13 @@ We will create a cyclic pattern of a length 400 greater than 2000 as those extra
 /usr/share/metasploit-framework/tools/exploit/pattern_create.rb -l 2400
 ```
 We paste the output as buffer in 02-offset.py and run the script.
-<img src="https://raw.githubusercontent.com/vbrunschot/TryHackMe/main/OSCP%20Buffer%20Overflow/assets/4.png">
+<img src="https://raw.githubusercontent.com/vbrunschot/Write-Ups/main/TryHackMe/OSCP%20Buffer%20Overflow/assets/4.png">
 
 Run the following command to find the exact EIP offset
 ```
 !mona findmsp -distance 2400
 ```
-<img src="https://raw.githubusercontent.com/vbrunschot/TryHackMe/main/OSCP%20Buffer%20Overflow/assets/5.png">
+<img src="https://raw.githubusercontent.com/vbrunschot/Write-Ups/main/TryHackMe/OSCP%20Buffer%20Overflow/assets/5.png">
 The EIP offset is 1978.
 
 
@@ -92,20 +92,20 @@ print()
 ```
 
 We add the characters to 03-badchar.py and change the EIP offset. 
-<img src="https://raw.githubusercontent.com/vbrunschot/TryHackMe/main/OSCP%20Buffer%20Overflow/assets/6.png">
+<img src="https://raw.githubusercontent.com/vbrunschot/Write-Ups/main/TryHackMe/OSCP%20Buffer%20Overflow/assets/6.png">
 
 Run 03-badchar.py and note the ESP after the crash (it's in the CPU windows). Compare it with the bin:
 ```
 !mona compare -f C:\mona\oscp\bytearray.bin -a <address>
 ```
-<img src="https://raw.githubusercontent.com/vbrunschot/TryHackMe/main/OSCP%20Buffer%20Overflow/assets/7.png">
+<img src="https://raw.githubusercontent.com/vbrunschot/Write-Ups/main/TryHackMe/OSCP%20Buffer%20Overflow/assets/7.png">
 
 Remove bad char from file and create new bin without bad chars:
 ```
 !mona bytearray -b "\x00\x07"
 ```
 Repeat these steps untill there are no more bad chars and the status is Unmodified.
-<img src="https://raw.githubusercontent.com/vbrunschot/TryHackMe/main/OSCP%20Buffer%20Overflow/assets/8.png">
+<img src="https://raw.githubusercontent.com/vbrunschot/Write-Ups/main/TryHackMe/OSCP%20Buffer%20Overflow/assets/8.png">
 
 
 # Finding a Jump Point
@@ -113,7 +113,7 @@ This command finds all "jmp esp" (or equivalent) instructions with addresses tha
 ```
 !mona jmp -r esp -cpb "\x00\x07\x2e\xa0"
 ```
-<img src="https://raw.githubusercontent.com/vbrunschot/TryHackMe/main/OSCP%20Buffer%20Overflow/assets/9.png">
+<img src="https://raw.githubusercontent.com/vbrunschot/Write-Ups/main/TryHackMe/OSCP%20Buffer%20Overflow/assets/9.png">
 We take the first address and reverse it as it's little-endian.
 
 ```
@@ -140,7 +140,7 @@ After setting all parameters in 04-exploit.py we're finally ready to run our exp
 python 04-exploit.py
 ```
 With our listener ready this will results in a reverse shell and because the application runs as admin we now have admin rights on the host.
-<img src="https://raw.githubusercontent.com/vbrunschot/TryHackMe/main/OSCP%20Buffer%20Overflow/assets/10.png">
+<img src="https://raw.githubusercontent.com/vbrunschot/Write-Ups/main/TryHackMe/OSCP%20Buffer%20Overflow/assets/10.png">
 
 # Conclusion
 Had a lot of fun doing this room. Learned a lot about memory allocation but still have the feeling I'm only scratching the surface.

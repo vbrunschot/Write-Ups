@@ -7,15 +7,15 @@ As always we'll start with a port scan on the target:
 sudo nmap -sV -p- -Pn -oN nmap.txt -O 10.10.5.229 
 ```
 The scan shows multiple open ports:
-<img src="https://raw.githubusercontent.com/vbrunschot/TryHackMe/main/Daily%20Bugle/assets/1.png">
+<img src="https://raw.githubusercontent.com/vbrunschot/Write-Ups/main/TryHackMe/Daily%20Bugle/assets/1.png">
 
 # Enumeration
 There's an Apache webserver running on port 80. After browsing to the website we are welcomed by a CMS. Wappalyzer tells us that it's running Joomla.
-<img src="https://raw.githubusercontent.com/vbrunschot/TryHackMe/main/Daily%20Bugle/assets/2.png">
+<img src="https://raw.githubusercontent.com/vbrunschot/Write-Ups/main/TryHackMe/Daily%20Bugle/assets/2.png">
 
 I tried SQL injection on the login form, but without any luck.
 Let's run joomscan on the target to get more information on Joomla.
-<img src="https://raw.githubusercontent.com/vbrunschot/TryHackMe/main/Daily%20Bugle/assets/3.png">
+<img src="https://raw.githubusercontent.com/vbrunschot/Write-Ups/main/TryHackMe/Daily%20Bugle/assets/3.png">
 
 
 We immediately spot that the version is outdated. 
@@ -36,13 +36,13 @@ Sqlmap took ages and in the meantime I searched for more exploits. I found Joomb
 > Joomblah https://github.com/stefanlucas/Exploit-Joomla
 
 This resulted in a username and a hash:
-<img src="https://raw.githubusercontent.com/vbrunschot/TryHackMe/main/Daily%20Bugle/assets/4.png">
+<img src="https://raw.githubusercontent.com/vbrunschot/Write-Ups/main/TryHackMe/Daily%20Bugle/assets/4.png">
 
 Running hashid on the hash tells us that it's probably a Blowfish algorithm:
-<img src="https://raw.githubusercontent.com/vbrunschot/TryHackMe/main/Daily%20Bugle/assets/5.png">
+<img src="https://raw.githubusercontent.com/vbrunschot/Write-Ups/main/TryHackMe/Daily%20Bugle/assets/5.png">
 
 You can look up which module you have to use at https://hashcat.net/wiki/doku.php?id=example_hashes.
-<img src="https://raw.githubusercontent.com/vbrunschot/TryHackMe/main/Daily%20Bugle/assets/6.png">
+<img src="https://raw.githubusercontent.com/vbrunschot/Write-Ups/main/TryHackMe/Daily%20Bugle/assets/6.png">
 ```
 hashcat -m 3200 -a 0 hash /usr/share/wordlists/rockyou.txt  
 ```
@@ -63,7 +63,7 @@ Basically we edit an existing page by replacing it's code with a PHP reverse she
 
 > php-reverse-shell https://github.com/pentestmonkey/php-reverse-shell/blob/master/php-reverse-shell.php
 
-<img src="https://raw.githubusercontent.com/vbrunschot/TryHackMe/main/Daily%20Bugle/assets/7.png">
+<img src="https://raw.githubusercontent.com/vbrunschot/Write-Ups/main/TryHackMe/Daily%20Bugle/assets/7.png">
 
 We change the IP and port and start our netcat listener:
 ```
@@ -75,10 +75,10 @@ After we browse to the page we'll get a low privilege shell on the host.
 ```
 http://10.10.5.229/templates/beez3/index.php
 ```
-<img src="https://raw.githubusercontent.com/vbrunschot/TryHackMe/main/Daily%20Bugle/assets/8.png">
+<img src="https://raw.githubusercontent.com/vbrunschot/Write-Ups/main/TryHackMe/Daily%20Bugle/assets/8.png">
 
 After searching around a but we find a configuration file in /var/www/html/
-<img src="https://raw.githubusercontent.com/vbrunschot/TryHackMe/main/Daily%20Bugle/assets/9.png">
+<img src="https://raw.githubusercontent.com/vbrunschot/Write-Ups/main/TryHackMe/Daily%20Bugle/assets/9.png">
 
 We can now try to login at the database but it seems that our IP address is blocked for access.
 
@@ -90,7 +90,7 @@ su jjameson
 ```
 
 Running ```sudo -l``` tells us we can run /usr/bin/yum as sudo.
-<img src="https://raw.githubusercontent.com/vbrunschot/TryHackMe/main/Daily%20Bugle/assets/10.png">
+<img src="https://raw.githubusercontent.com/vbrunschot/Write-Ups/main/TryHackMe/Daily%20Bugle/assets/10.png">
 
 A quick search on GTFOBins teaches us we can abuse yum to escalate our privileges:
 ```
@@ -120,7 +120,7 @@ sudo yum -c $TF/x --enableplugin=y
 ```
 And we have a root shell:
 
-<img src="https://raw.githubusercontent.com/vbrunschot/TryHackMe/main/Daily%20Bugle/assets/11.png">
+<img src="https://raw.githubusercontent.com/vbrunschot/Write-Ups/main/TryHackMe/Daily%20Bugle/assets/11.png">
 
 
 # Conclusion
