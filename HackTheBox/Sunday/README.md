@@ -7,6 +7,7 @@ sudo nmap -sV -sC -O -p- -oN nmap.txt 10.10.10.76 -T 5 --max-retries 0
 
 # Enumeration
 We can do a simple check to see which users exist:
+
 <img src="https://raw.githubusercontent.com/vbrunschot/Write-Ups/main/HackTheBox/Sunday/assets/1.png">
 
 # Initial Foothold
