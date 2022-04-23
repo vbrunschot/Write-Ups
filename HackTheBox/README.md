@@ -1,2 +1,1 @@
-# HackTheBox
-Write-ups for HackTheBox
+#emtpy
