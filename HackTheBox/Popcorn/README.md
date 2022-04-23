@@ -1,6 +1,6 @@
 # Recon
 
-We start with the usual nmap scan on the target. It shows 2 open ports and the target seems to be running on Linux. 
+We start with the usual nmap scan on the target. It shows 2 open ports and the target seems to be running Linux. 
 ```
 sudo nmap -sV -p- -sC -oN nmap.txt -O 10.10.10.6 -T5
 ```
@@ -12,11 +12,11 @@ Browsing to http://10.10.10.6 shows a default page, nothing interesting here. Le
 
 <img src="https://raw.githubusercontent.com/vbrunschot/Write-Ups/main/HackTheBox/Popcorn/assets/2.png">
 
-We find several interesting directories. One seems to be running a API to rename of move files. This might be usefull later on.
+We find several interesting directories. One seems to be running an API to rename of move files. This might be usefull later on.
 
 <img src="https://raw.githubusercontent.com/vbrunschot/Write-Ups/main/HackTheBox/Popcorn/assets/3.png">
 
-On ```/torrent``` there's a torrent website where we can create a user and add a new torrent. Most obvious thing to try to accomplish is to upload a reverse shell script and execute it while we have a listener ready. I tried uploading a php script but the filter blocked the upload.
+On ```/torrent``` there's a torrent website where we can create a new user and add a new torrent. Most obvious thing to try to accomplish is to upload a reverse shell script and execute it while we have a listener ready. I tried uploading a php script but the filter blocked the upload.
 
 <img src="https://raw.githubusercontent.com/vbrunschot/Write-Ups/main/HackTheBox/Popcorn/assets/4.png">
 
@@ -28,9 +28,7 @@ We have successfully uploaded the torrent and see that we can also add a screens
 <img src="https://raw.githubusercontent.com/vbrunschot/Write-Ups/main/HackTheBox/Popcorn/assets/7.png">
 
 We now have a reverse shell. We stabilize it using ```python -c 'import pty;pty.spawn("/bin/bash")'``` and find the user flag in the ```george``` home folder.
-
 <img src="https://raw.githubusercontent.com/vbrunschot/Write-Ups/main/HackTheBox/Popcorn/assets/11.png">
-
 
 # Privilege Escalation
 After some poking around we find out that the kernel version is outdated and has known vulnerabilities.
