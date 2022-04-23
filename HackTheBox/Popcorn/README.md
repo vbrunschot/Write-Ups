@@ -28,6 +28,7 @@ We have successfully uploaded the torrent and see that we can also add a screens
 <img src="https://raw.githubusercontent.com/vbrunschot/Write-Ups/main/HackTheBox/Popcorn/assets/7.png">
 
 We now have a reverse shell. We stabilize it using ```python -c 'import pty;pty.spawn("/bin/bash")'``` and find the user flag in the ```george``` home folder.
+
 <img src="https://raw.githubusercontent.com/vbrunschot/Write-Ups/main/HackTheBox/Popcorn/assets/11.png">
 
 # Privilege Escalation
