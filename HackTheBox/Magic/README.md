@@ -80,6 +80,8 @@ We can try to connect to the MySQL database using ```mysql``` but it isn't insta
 
 Running the following code will iterate the tables in the database. We run into an access denied error but are able to view the content of the login table. This contains a password. We try if this is the password for the theseus account which seems to be the case.
 
+<img src="https://raw.githubusercontent.com/vbrunschot/Write-Ups/main/HackTheBox/Magic/assets/10.png">
+
 ```
 su theseus
 ```
