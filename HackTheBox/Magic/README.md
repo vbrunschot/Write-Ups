@@ -4,7 +4,7 @@ sudo nmap -sV -p- -sC -oN nmap.txt -O 10.10.10.185 -T5
 ```
 <img src="https://raw.githubusercontent.com/vbrunschot/Write-Ups/main/HackTheBox/Magic/assets/1.png">
 
-We discover two open ports and see that the target is running Linux. Browsing to the webserver on port 80 shows us an image upload page. We can try to gain initial foothold by uploading a reverse script. This will bropably be blocked by a filter but we can try to bypass this.
+We discover two open ports and see that the target is running Linux. Browsing to the webserver on port 80 shows us an image upload page. We can try to gain initial foothold by uploading a reverse script. This will brobably be blocked by a filter but we can try to bypass this.
 
 # Enumeration
 We find a link to a login page. Let's first try to run gobuster in an attempt to find folders and files which could lead us to usernames and other info. We also check to see if there's a robots.txt file which can contain usefull folders.
@@ -27,7 +27,7 @@ We've found an ```/uploads``` folder. This might be usefull later on.
 
 <img src="https://raw.githubusercontent.com/vbrunschot/Write-Ups/main/HackTheBox/Magic/assets/2.png">
 
-There is a filter blocking other filetypes than JPG, JPEG and PNG files. Let's fire up BurSuite to see if we can intercept the request and change it to our liking. Let's rename a JPEG file to .jpeg.php and intercept the request. We did the exact same thing eralier on the Popcorn box.
+There is a filter blocking other filetypes than JPG, JPEG and PNG files. Let's fire up BurpSuite to see if we can intercept the request and change it to our liking. Let's rename a JPEG file to .jpeg.php and intercept the request. We did the exact same thing earlier on the Popcorn box.
 
 <img src="https://raw.githubusercontent.com/vbrunschot/Write-Ups/main/HackTheBox/Magic/assets/4.png">
 
@@ -69,7 +69,7 @@ Press ctrl+z key combination
 stty raw -echo; fg
 ``` 
 
-We'll look around for files with SUID set, crontab jobs, kernel version, running processes but nothing stands out here. While looking around our webserver folders we discover a file containing database login credentials.
+We'll look around for files with SUID set, cron jobs, kernel version, running processes but nothing stands out here. While looking around our webserver folders we discover a file containing database login credentials.
 
 ```
 /var/www/Magic/db.php5
