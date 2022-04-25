@@ -56,4 +56,23 @@ With our listener ready on port 4444 we now have a low priviliged reverse shell:
 
 <img src="https://raw.githubusercontent.com/vbrunschot/Write-Ups/main/HackTheBox/Magic/assets/6.png">
 
+# Lateral Movement
+We spawn a TTY shell using Python3:
+```
+python3 -c 'import pty;pty.spawn("/bin/bash")'
+export TERM=xterm
+
+Press ctrl+z key combination 
+
+stty raw -echo; fg
+``` 
+
+We'll look around for files with SUID set, crontab jobs, kernel version, running processes but nothing stands out here. While looking around our webserver folders we discover a file containing database information.
+
+```
+/var/www/Mafic/db.php5
+```
+<img src="https://raw.githubusercontent.com/vbrunschot/Write-Ups/main/HackTheBox/Magic/assets/7.png">
+
+
 # Privilege Escalation
