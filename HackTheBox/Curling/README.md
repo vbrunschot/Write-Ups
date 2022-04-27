@@ -61,6 +61,7 @@ stty raw -echo; fg
 We look for cron jobs, running processes and check the kernel version with ```uname -a```. This shows the target is running Linux Curling 4.15.0. Nothing special to see here.
 
 When browsing the users files we have access to a file named ```pass_word``` backup. After investigating this file it turns out to be hex dump using ```xxd```. Which we can reverse.
+
 <img src="https://raw.githubusercontent.com/vbrunschot/Write-Ups/main/HackTheBox/Curling/assets/9.png">
 
 ```
