@@ -83,7 +83,7 @@ cat password.txt
 
 <img src="https://raw.githubusercontent.com/vbrunschot/Write-Ups/main/HackTheBox/Curling/assets/10.png">
 
-This provides us a password: ```5d<wdCbdZu)|hChXll```. We can now use ```su floris``` and enter the password to have access using the ```floris``` account.
+This provides us with a password: ```5d<wdCbdZu)|hChXll```. We can now use ```su floris``` and enter the password to have access using the ```floris``` account.
 
 # Privilege Escalation (Method 1)
 We now have access to the ```admin-area``` where we find two files named ```input``` and ```report```. There's probably a cron job running as root. We can confirm this by running the following command:
