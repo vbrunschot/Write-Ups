@@ -41,7 +41,7 @@ Reviewing the code from the website reveals a secret.txt file. This file contain
 
 We can now login at the administrator page using ```Floris``` and ```Curling2018!```.
 
-Next thing we can try is to upload a reverse php shell (from Pentestmonkey). A filter is blocking this attempt. We can try to bypass these filters by altering the request but it didn't seem to work. Another method is to change the content of a page. We'll do this for the ```index.php``` page after browsing to ```Extensions >  Templates > Templates > Beez3 Details and Files```.
+Next thing we can try is to upload a reverse php shell from Pentestmonkey. A filter is blocking this attempt. We can try to bypass these filters by altering the request but it didn't seem to work. Another method is to change the content of a page. We'll do this for the ```index.php``` page after browsing to ```Extensions >  Templates > Templates > Beez3 Details and Files```.
 
 <img src="https://raw.githubusercontent.com/vbrunschot/Write-Ups/main/HackTheBox/Curling/assets/8.png">
 
@@ -49,7 +49,7 @@ As soon as we preview the template we have a reverse shell:
 
 <img src="https://raw.githubusercontent.com/vbrunschot/Write-Ups/main/HackTheBox/Curling/assets/7.png">
 
-# Privilege Escalation
+# Lateral movement
 Trying to upgrade to a PTY shell didn't work as there's no ```python``` installed. We can however try to upgrade to a TTY shell:
 ```
 /usr/bin/script -qc /bin/bash /dev/null	
@@ -57,6 +57,34 @@ export TERM=xterm
 Press ctrl+z key combination 
 stty raw -echo; fg
 ```
+
+We look for cron jobs, running processes and check the kernel version with ```uname -a```. This shows the target is running Linux Curling 4.15.0. Nothing special to see here.
+
+When browsing the users files we have access to a file named ```pass_word``` backup. After investigating this file it turns out to be hex dump using ```xxd```. Which we can reverse.
+<img src="https://raw.githubusercontent.com/vbrunschot/Write-Ups/main/HackTheBox/Curling/assets/9.png">
+
+```
+cat password_backup | xxd -r > output
+```
+
+We then have to extract the file a few times using the following commands:
+```
+bzip2 -d bak
+file bak.out
+mv bak.out bak.gz
+gzip -d bak.gz
+file bak
+bzip2 -d bak
+file bak.out
+tar xf bak.out
+cat password.txt
+```
+
+<img src="https://raw.githubusercontent.com/vbrunschot/Write-Ups/main/HackTheBox/Curling/assets/10.png">
+
+This provides us a password: ```5d<wdCbdZu)|hChXll```. We can now use ```su floris``` and enter the password to have access using the ```floris``` account.
+
+# Privilege Escalation
 
 
 
