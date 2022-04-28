@@ -34,9 +34,11 @@ And then run with ```ruby drupalgeddon2.rb http://10.10.10.9/``` to get a shell:
 
 <img src="https://raw.githubusercontent.com/vbrunschot/Write-Ups/main/HackTheBox/Bastard/assets/5.png">
 
-With the ```systeminfo``` command we get more information about the target. It's running Microsoft Windows Server 2008 R2 Datacenter 6.1.7600. At this point we can;t see if the system is patched.
+With the ```systeminfo``` command we get more information about the target. It's running Microsoft Windows Server 2008 R2 Datacenter 6.1.7600. At this point we can't see if the system is patched.
 
-We're unable to download any files using ```drupalgeddon2``` so we'll change the script a bit to get a reverse php shell. From there we can work further on with the privilege escalation.
+<img src="https://raw.githubusercontent.com/vbrunschot/Write-Ups/main/HackTheBox/Bastard/assets/6.png">
+
+[TO BE CONTINUED]
 
 
 
