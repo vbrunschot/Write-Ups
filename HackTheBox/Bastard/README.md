@@ -23,9 +23,21 @@ But we can check for usernames to see if it's already in use:
 
 <img src="https://raw.githubusercontent.com/vbrunschot/Write-Ups/main/HackTheBox/Bastard/assets/3.png">
 
-We can also spot the version by browsing to ```http://10.10.10.9/changelog.txt```. It appears to run on Drpal version 7.54 which has a remote code execution vulnerability. we can find more information following this blog: https://vk9-sec.com/drupal-7-x-module-services-remote-code-execution/
+# Initial Foothold
+We can also spot the version by browsing to ```http://10.10.10.9/changelog.txt```. It appears to run on Drupal version 7.54 which has a remote code execution vulnerability. We can use ```drupalgeddon2``` to gain a reverse shell. https://github.com/dreadlocked/Drupalgeddon2
 
-[TO BE CONTINUED]
+You'll have to install the ```highline gem``` if you haven't already:
+```
+sudo gem install highline
+```
+And then run with ```ruby drupalgeddon2.rb http://10.10.10.9/``` to get a shell:
+
+<img src="https://raw.githubusercontent.com/vbrunschot/Write-Ups/main/HackTheBox/Bastard/assets/5.png">
+
+With the ```systeminfo``` command we get more information about the target. It's running Microsoft Windows Server 2008 R2 Datacenter 6.1.7600. At this point we can;t see if the system is patched.
+
+We're unable to download any files using ```drupalgeddon2``` so we'll change the script a bit to get a reverse php shell. From there we can work further on with the privilege escalation.
+
 
 
 
