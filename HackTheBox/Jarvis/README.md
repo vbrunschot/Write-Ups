@@ -23,3 +23,22 @@ Trying ```supersecurehotel``` as username and password (found on the homepage) a
 When we browse to the webservice on port ```64999``` we are immediately confronted with yhe following message:
 
 <img src="https://raw.githubusercontent.com/vbrunschot/Write-Ups/main/HackTheBox/Jarvis/assets/4.png">
+
+# Initial Foothold
+We can try to run ```sqlmap``` on the host. When we use ```crawl=2``` it'll also scan for links in pages. We combine this with ```--os-shell``` to hopefully get a shell on the host.
+```
+sqlmap -u http://10.10.10.143 --os-shell --crawl=2
+```
+<img src="https://raw.githubusercontent.com/vbrunschot/Write-Ups/main/HackTheBox/Jarvis/assets/5.png">
+
+We can use this to get a more stable shell. We'll host a php reverse shell script on our attacking machine and download it using ```wget```. Then we browse to our page to get a reverse shell in return.
+
+# Lateral Movement
+
+# Privilege escalation
+
+
+
+
+
+
