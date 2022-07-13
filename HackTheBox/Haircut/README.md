@@ -77,7 +77,7 @@ gcc -o rootshell rootshell.c
 ```
 This will return some errors but we can ignore them. The code refers to other locations than our attacking machine but after we transfer them to the host it'll work fine.
 
-Now that we have created the files we download them to our target. We change the references in ```ld.so.preload``` and finally run our rootshell.
+Now that we have created the files we download them to our target. We change the references in ```ld.so.preload``` and finally run our rootshell trough ```screen```.
 
 <img src="https://raw.githubusercontent.com/vbrunschot/Write-Ups/main/HackTheBox/Haircut/assets/5.png">
 
