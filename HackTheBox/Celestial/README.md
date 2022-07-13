@@ -1,6 +1,6 @@
 # Recon
 
-As usual we start with a port scan on the target:
+As usual we start with a port scan against the target:
 ```
 sudo nmap -sV -p- -sC -oN nmap.txt -O 10.10.10.85 -T5
 ```
