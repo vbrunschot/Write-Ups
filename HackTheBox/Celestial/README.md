@@ -66,7 +66,7 @@ Press ctrl+z key combination
 stty raw -echo; fg
 ```
 
-One thing we notice is that user ```sun``` is part of the ```sudo``` group. We also spot a file called ```script.py``` in the home directory. One directory up we find ```output.txt``` which get's changed every 5 minutes. The content is the content from ```script.py```.
+One thing we notice is that user ```sun``` is part of the admin group. We also spot a file called ```script.py``` in the home directory. One directory up we find ```output.txt``` which get's changed every 5 minutes. The content is the content from ```script.py```.
 
 If this script is initiated by the root user we can try to alter the content of the file in order to give us a root shell.
 
