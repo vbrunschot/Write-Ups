@@ -92,7 +92,7 @@ evil-winrm -S -k legacy.key -c legacy.crt -i 10.10.11.152
 <img src="https://raw.githubusercontent.com/vbrunschot/Write-Ups/main/HackTheBox/Timelapse/assets/8.png">
 
 # Lateral Movement
-We are unable to use ```winPEAS``` because Microsoft Defender is blocking the file. Using an obfuscated version didn't help either. After further enumerating the host for the usual ways for privilege escalation I was unable to find anything useful. I tried running Powershell scripts but without any luck. I got some help pointing me in the right direction and found the Powershell history file:
+We are unable to use ```winPEAS``` because Microsoft Defender is blocking the file. Using an obfuscated version didn't help either. After further enumerating the host for the usual ways for privilege escalation I was unable to find anything useful. I tried running the usual Powershell scripts and commands but without any luck. I got some help pointing me in the right direction and found the Powershell history file:
 
 <img src="https://raw.githubusercontent.com/vbrunschot/Write-Ups/main/HackTheBox/Timelapse/assets/9.png">
 
