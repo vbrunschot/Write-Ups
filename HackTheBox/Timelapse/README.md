@@ -96,7 +96,7 @@ We are unable to use ```winPEAS``` because Microsoft Defender is blocking the fi
 
 <img src="https://raw.githubusercontent.com/vbrunschot/Write-Ups/main/HackTheBox/Timelapse/assets/9.png">
 
-We found the password for the ```svc_deploy``` account and can use this to run commands as the this user.
+We found the password for the ```svc_deploy``` account and can use this to run commands as this user.
 
 ```
 $so = New-PSSessionOption -SkipCACheck -SkipCNCheck -SkipRevocationCheck
