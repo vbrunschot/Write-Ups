@@ -14,7 +14,7 @@ Trying to run ```gobuster``` with the usual parameters results in an error.
 ```
 Error: the server returns a status code that matches the provided options for non existing urls. http://10.10.10.87/489ed9d8-b292-401f-aa42-a70621925b38 => 302 (Length: 0). To continue please exclude the status code, the length or use the --wildcard switch
 ```
-This is caused by the webserver returning us a 302 status code. We can confirm this by browsing to a nonexistent page and ctach the return:
+This is caused by the webserver returning us a 302 status code. We can confirm this by browsing to a nonexistent page and catch the return:
 ```
 curl -vvv http://10.10.10.87/test
 ```
@@ -62,8 +62,18 @@ We can now use ```ssh``` to connect to the target.
 ssh nobody@10.10.10.87 -i id_rsa
 ```
 
+<img src="https://raw.githubusercontent.com/vbrunschot/Write-Ups/main/HackTheBox/Waldo/assets/8.png">
+
+# Privilege Escalation
+We download and run ```linpeas.sh``` on the target which tells us our current shell is situated within a Docker container.
+
+<img src="https://raw.githubusercontent.com/vbrunschot/Write-Ups/main/HackTheBox/Waldo/assets/9.png">
+
+We could also use the following commands to confirm this:
+```
+grep -i docker /proc/self/cgroup 2>/dev/null
+find / -name "*dockerenv*" -exec ls -la {} \; 2>/dev/null
+```
+
 
 [TO BE CONTINUED]
-
-# Lateral Movement
-# Privilege Escalation
