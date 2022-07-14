@@ -94,7 +94,7 @@ evil-winrm -S -k legacy.key -c legacy.crt -i 10.10.11.152
 # Lateral Movement
 We are unable to use ```winPEAS``` because Microsoft Defender is blocking the file. Using an obfuscated version didn't help either. After further enumerating the host for the usual ways for privilege escalation i was unable to find anything useful. I got some help pointing me in the right direction and found the Powershell history file:
 
-pic9
+<img src="https://raw.githubusercontent.com/vbrunschot/Write-Ups/main/HackTheBox/Timelapse/assets/9.png">
 
 We found the password for the ```svc_deploy``` account and can use this to run commands as the this user.
 
@@ -113,7 +113,7 @@ invoke-command -computername localhost -credential $c -port 5986 -usessl -Sessio
 invoke-command -computername localhost -credential $c -port 5986 -usessl -SessionOption $so -scriptblock {net user svc_deploy}
 ```
 
-pic10
+<img src="https://raw.githubusercontent.com/vbrunschot/Write-Ups/main/HackTheBox/Timelapse/assets/10.png">
 
 
 # Privilege Escalation
@@ -123,7 +123,7 @@ We see that this user is member of the ```LAPS_Readers``` group which is useful 
 invoke-command -computername localhost -credential $c -port 5986 -usessl -SessionOption $so -scriptblock {Get-ADComputer -Filter * -Properties ms-Mcs-AdmPwd, ms-Mcs-AdmPwdExpirationTime}
 ```
 
-pic11
+<img src="https://raw.githubusercontent.com/vbrunschot/Write-Ups/main/HackTheBox/Timelapse/assets/11.png">
 
 Now that we've found the password we can again use ```evil-winrm``` to connect to the target as ```administrator```.
 
