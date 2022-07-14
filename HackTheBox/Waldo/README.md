@@ -5,7 +5,7 @@ As usual we start with a port scan against the target:
 sudo nmap -sV -p- -sC -oN nmap.txt -O 10.10.10.87 -T5
 ```
 
-<img src="https://raw.githubusercontent.com/vbrunschot/Write-Ups/main/HackTheBox/Timelapse/assets/1.png">
+<img src="https://raw.githubusercontent.com/vbrunschot/Write-Ups/main/HackTheBox/Waldo/assets/1.png">
 
 
 # Enumeration
@@ -19,7 +19,7 @@ This is caused by the webserver returning us a 302 status code. We can confirm t
 curl -vvv http://10.10.10.87/test
 ```
 
-pic2
+<img src="https://raw.githubusercontent.com/vbrunschot/Write-Ups/main/HackTheBox/Waldo/assets/2.png">
 
 We can tell ```gobuster``` to ignore status codes by marking them as bad using ```-b```. With these small adjustments we can now start our scan for files and directories:
 ```
@@ -30,30 +30,33 @@ After half an hour we only got ```list.html``` which we already knew.
 
 There is a "List Manager" running on the webserver. We can use ```BurpSuite``` to intercept the request to take a closer look.
 
-pic3
+<img src="https://raw.githubusercontent.com/vbrunschot/Write-Ups/main/HackTheBox/Waldo/assets/3.png">
 
 We see that the ```/dirRead.php``` is requested with the ```path``` parameter set. We can change this to show all files in the directory.
 
-pic4
+<img src="https://raw.githubusercontent.com/vbrunschot/Write-Ups/main/HackTheBox/Waldo/assets/4.png">
 
 The response shows us interesting php files. We also try if we can use ```../``` for directory traversal but it doesn't seem to work. Let's try to use ```fileRead.php``` to read the source code of ```fileRead.php```. 
 
-pic5
+<img src="https://raw.githubusercontent.com/vbrunschot/Write-Ups/main/HackTheBox/Waldo/assets/5.png">
 
 Saving the result and reading through it using ```strings``` tells us that ```../``` is replaced and we can't view ```user.txt```. That's why earlier we were unable to use directory traversal.
 ```
 str_replace( array("../", "..\"")
 ```
-(Removed the escape character ```\```)
+> (Removed the escape character ```\```)
 
-```dirRead.php``` also has the same protectiong. But we can evade this by altering our request to ```....//```. Note that we add two extra periods and one slash which will be replaced. That leaves us with the remaining ```../``` thus enabling directory traversal. We can add a few more in order to browse to the highest level.
+```dirRead.php``` also has the same protection. But we can evade this by altering our request to ```....//```. Note that we add two extra periods and one slash which will be replaced by an empty char. That leaves us with the remaining ```../``` thus enabling directory traversal. We can add a few more in order to browse the highest level.
 
-pic 6
+<img src="https://raw.githubusercontent.com/vbrunschot/Write-Ups/main/HackTheBox/Waldo/assets/6.png">
 
 # Initial Foothold
 After browsing around we spot the ```.ssh``` folder in the home directory of user ```nobody```. We can use ```fileRead.php``` to retrieve it's content.
 
-pic 7
+<img src="https://raw.githubusercontent.com/vbrunschot/Write-Ups/main/HackTheBox/Waldo/assets/7.png">
+
+
+[TO BE CONTINUED]
 
 # Lateral Movement
 # Privilege Escalation
