@@ -51,9 +51,16 @@ str_replace( array("../", "..\"")
 <img src="https://raw.githubusercontent.com/vbrunschot/Write-Ups/main/HackTheBox/Waldo/assets/6.png">
 
 # Initial Foothold
-After browsing around we spot the ```.ssh``` folder in the home directory of user ```nobody```. We can use ```fileRead.php``` to retrieve it's content.
+After browsing around we spot the ```.ssh``` folder in the home directory of user ```nobody```. It contains ```.monitor``` and we can use ```fileRead.php``` to retrieve it's content:
 
 <img src="https://raw.githubusercontent.com/vbrunschot/Write-Ups/main/HackTheBox/Waldo/assets/7.png">
+
+We have to do some formatting on the key before we can use it. Change ```\/``` to ```/``` and change ```\n``` to a new line. Save it as ```id_rsa``` and change it's permission to 600 by running ```chmod 600 id_rsa```.
+
+We can now use ```ssh``` to connect to the target.
+```
+ssh nobody@10.10.10.87 -i id_rsa
+```
 
 
 [TO BE CONTINUED]
