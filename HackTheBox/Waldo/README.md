@@ -83,18 +83,33 @@ ssh -i /home/nobody/.ssh/.monitor monitor@localhost
 # Escaping Restricted Environment Method 1
 We are in a restricted environment and can only run a few binaries.
 
-pic10
+<img src="https://raw.githubusercontent.com/vbrunschot/Write-Ups/main/HackTheBox/Waldo/assets/10.png">
 
 By using the ```-l``` prefix we can see the links that are used to the actual binaries. Sometimes a ```r``` is added in front of the name to imply restrictions. GTFOBins tells us that ```ed``` can be used to spawn a shell which breaks us out of the restricted environment.
 
 Just run ```red``` followed by ```!/bin/sh```.
 
 # Escaping Restricted Environment Method 2
+We can force a tty during the login which will bypass ```rbash```.
 
+```
+ssh monitor@localhost -i ~/.ssh/.monitor -t bash
+```
 
+We do have to set the ```PATH``` variable in order for the shell to be functional.
+
+```
+export PATH=$PATH:/bin:/sbin:/usr/bin:/usr/sbin:/usr/local/bin:/usr/local/sbin
+```
 
 # Privilege Escalation
+After some searching around I looked for binaries with the ```+ei``` capabilities set. 
+```
+getcap -r / 2>/dev/null
+```
+
+Turns out this is the case for ```tac``` and GTFOBins tells us we can read otherwise restricted files. We can use this to read the ```root.txt``` file.
+
+<img src="https://raw.githubusercontent.com/vbrunschot/Write-Ups/main/HackTheBox/Waldo/assets/11.png">
 
 
-
-[TO BE CONTINUED]
