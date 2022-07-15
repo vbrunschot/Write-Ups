@@ -103,12 +103,12 @@ export PATH=$PATH:/bin:/sbin:/usr/bin:/usr/sbin:/usr/local/bin:/usr/local/sbin
 ```
 
 # Privilege Escalation
-After some searching around I looked for binaries with the ```+ei``` capabilities set. 
+After some searching around I looked for binaries with capabilities set. 
 ```
 getcap -r / 2>/dev/null
 ```
 
-Turns out this is the case for ```tac``` and GTFOBins tells us we can read otherwise restricted files. We can use this to read the ```root.txt``` file.
+Turns out this is the case for ```tac``` and GTFOBins tells us we can read otherwise restricted files. We use this to read the ```root.txt``` file.
 
 <img src="https://raw.githubusercontent.com/vbrunschot/Write-Ups/main/HackTheBox/Waldo/assets/11.png">
 
