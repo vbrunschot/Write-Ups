@@ -55,7 +55,7 @@ After browsing around we spot the ```.ssh``` folder in the home directory of use
 
 <img src="https://raw.githubusercontent.com/vbrunschot/Write-Ups/main/HackTheBox/Waldo/assets/7.png">
 
-We have to do some formatting on the key before we can use it. Change ```\/``` to ```/``` and change ```\n``` to a new line. Save it as ```id_rsa``` and change it's permission to 600 by running ```chmod 600 id_rsa```.
+We have to do some formatting on the key before we can use it. Change ```\/``` to ```/``` and change ```\n``` to a new line. U can also use an online json decoder. Save it as ```id_rsa``` and change it's permission to 600 by running ```chmod 600 id_rsa```.
 
 We can now use ```ssh``` to connect to the target.
 ```
@@ -64,16 +64,37 @@ ssh nobody@10.10.10.87 -i id_rsa
 
 <img src="https://raw.githubusercontent.com/vbrunschot/Write-Ups/main/HackTheBox/Waldo/assets/8.png">
 
-# Privilege Escalation
+# Lateral Movement
 We download and run ```linpeas.sh``` on the target which tells us our current shell is situated within a Docker container.
 
 <img src="https://raw.githubusercontent.com/vbrunschot/Write-Ups/main/HackTheBox/Waldo/assets/9.png">
 
-We could also use the following commands to confirm this:
+Another way is to use the following commands to confirm this:
 ```
 grep -i docker /proc/self/cgroup 2>/dev/null
 find / -name "*dockerenv*" -exec ls -la {} \; 2>/dev/null
 ```
+
+We can try to use the earlier found key to create a session as ```monitor```
+```
+ssh -i /home/nobody/.ssh/.monitor monitor@localhost
+```
+
+# Escaping Restricted Environment Method 1
+We are in a restricted environment and can only run a few binaries.
+
+pic10
+
+By using the ```-l``` prefix we can see the links that are used to the actual binaries. Sometimes a ```r``` is added in front of the name to imply restrictions. GTFOBins tells us that ```ed``` can be used to spawn a shell which breaks us out of the restricted environment.
+
+Just run ```red``` followed by ```!/bin/sh```.
+
+# Escaping Restricted Environment Method 2
+
+
+
+# Privilege Escalation
+
 
 
 [TO BE CONTINUED]
